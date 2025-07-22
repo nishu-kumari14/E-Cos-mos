@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Register - Cosmos</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<div class="app-container">
+  <div class="form-container">
+    <h2>
+      <i class="fas fa-user-plus"></i> Create Account
+    </h2>
+    <p style="margin-bottom: 2rem; color: #666; text-align: center;">
+      Join Cosmos and start your shopping journey - Everything available here
+    </p>
+    
+    <form method="post" th:action="@{/register}" th:object="${user}">
+      <div class="form-group">
+        <label for="username">
+          <i class="fas fa-user"></i> Username
+        </label>
+        <input type="text" id="username" th:field="*{username}" 
+               placeholder="Enter your username" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="email">
+          <i class="fas fa-envelope"></i> Email Address
+        </label>
+        <input type="email" id="email" th:field="*{email}" 
+               placeholder="Enter your email" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="password">
+          <i class="fas fa-lock"></i> Password
+        </label>
+        <input type="password" id="password" th:field="*{password}" 
+               placeholder="Create a strong password" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="role">
+          <i class="fas fa-user-tag"></i> Register as
+        </label>
+        <select id="role" th:field="*{role}" required style="width: 100%; padding: 1rem; border: 2px solid #e1e8ed; border-radius: 10px; font-size: 1rem; background: #f8f9fa;">
+          <option value="ROLE_BUYER">🛒 Buyer - Shop products</option>
+          <option value="ROLE_SELLER">🏪 Seller - Sell products</option>
+        </select>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </form>
+    
+    <p>
+      Already have an account? 
+      <a th:href="@{/login}">
+        <i class="fas fa-sign-in-alt"></i> Sign In
+      </a>
+    </p>
+    
+    <div style="margin-top: 2rem; text-align: center;">
+      <a href="/home" style="color: #667eea; text-decoration: none;">
+        <i class="fas fa-arrow-left"></i> Back to Shop
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

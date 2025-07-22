@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Order Success - Cosmos</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .success-animation {
+      animation: checkmark 0.6s ease-in-out;
+    }
+    
+    @keyframes checkmark {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    .success-icon {
+      font-size: 4rem;
+      color: #28a745;
+      margin-bottom: 1rem;
+      animation: checkmark 0.8s ease-in-out;
+    }
+    
+    .order-details {
+      background: rgba(40, 167, 69, 0.1);
+      padding: 2rem;
+      border-radius: 15px;
+      margin: 2rem 0;
+      border-left: 5px solid #28a745;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+      .action-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      .action-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="form-container" style="max-width: 700px; margin-top: 5rem;">
+    <div class="success-animation" style="text-align: center;">
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h2 style="color: #28a745; font-size: 2.5rem; margin-bottom: 1rem;">
+        Order Placed Successfully!
+      </h2>
+      <p style="font-size: 1.2rem; color: #666; margin-bottom: 2rem;">
+        Thank you for your purchase. Your order has been confirmed and is being processed.
+      </p>
+    </div>
+    
+    <div class="order-details">
+      <div style="text-align: center;">
+        <div style="margin-bottom: 1rem;">
+          <i class="fas fa-receipt" style="color: #667eea; margin-right: 0.5rem;"></i>
+          <span style="font-size: 1.1rem; font-weight: 500;">Order ID:</span>
+          <br>
+          <span th:text="${order.id}" style="font-size: 1.4rem; font-weight: bold; color: #667eea;">#000</span>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+          <i class="fas fa-calendar" style="color: #667eea; margin-right: 0.5rem;"></i>
+          <span style="font-size: 1.1rem; font-weight: 500;">Order Date:</span>
+          <br>
+          <span th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy HH:mm')}" 
+                style="font-size: 1.2rem; font-weight: bold; color: #2c3e50;">Date</span>
+        </div>
+        
+        <div>
+          <i class="fas fa-money-bill-wave" style="color: #28a745; margin-right: 0.5rem;"></i>
+          <span style="font-size: 1.1rem; font-weight: 500;">Total Amount:</span>
+          <br>
+          <span style="font-size: 1.6rem; font-weight: bold; color: #28a745;">
+            ₹<span th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <div style="background: rgba(102, 126, 234, 0.05); padding: 1.5rem; border-radius: 10px; text-align: center; margin: 2rem 0;">
+      <p style="margin: 0; color: #666;">
+        <i class="fas fa-info-circle" style="color: #667eea; margin-right: 0.5rem;"></i>
+        You will receive an order confirmation email shortly. You can track your order status in the Order History section.
+      </p>
+    </div>
+    
+    <div class="action-buttons">
+      <a th:href="@{/order/history}" class="btn btn-primary">
+        <i class="fas fa-history"></i> View Order History
+      </a>
+      <a th:href="@{/home}" class="btn btn-secondary">
+        <i class="fas fa-shopping-bag"></i> Continue Shopping
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Confetti effect (simple version)
+  setTimeout(() => {
+    for(let i = 0; i < 100; i++) {
+      let confetti = document.createElement('div');
+      confetti.style.position = 'fixed';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.top = '-10px';
+      confetti.style.width = '10px';
+      confetti.style.height = '10px';
+      confetti.style.backgroundColor = ['#667eea', '#764ba2', '#28a745', '#ffeaa7'][Math.floor(Math.random() * 4)];
+      confetti.style.zIndex = '1000';
+      confetti.style.opacity = '0.8';
+      document.body.appendChild(confetti);
+      
+      let fall = confetti.animate([
+        { transform: 'translateY(-100vh) rotate(0deg)' },
+        { transform: 'translateY(100vh) rotate(360deg)' }
+      ], {
+        duration: Math.random() * 3000 + 2000,
+        easing: 'linear'
+      });
+      
+      fall.addEventListener('finish', () => confetti.remove());
+    }
+  }, 500);
+</script>
+</body>
+</html>
+  </style>
+</head>
+<body>
+<div class="success-container">
+  <h2>Order Successful! 🎉</h2>
+  <p>Thank you for your purchase!</p>
+  <p>Your Order ID: <span class="order-id" th:text="${order.id}"></span></p>
+  <p>Total Paid: <span class="total-amount" th:text="'₹ ' + ${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')}"></span></p>
+  <p>Status: <span th:text="${order.status}"></span></p>
+
+  <a th:href="@{/home}">Continue Shopping</a>
+</div>
+</body>
+</html>

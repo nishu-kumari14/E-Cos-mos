@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Order History - Cosmos</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .order-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(102, 126, 234, 0.1);
+        position: relative;
+    }
+    
+    .order-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f1f3f4;
+    }
+    
+    .order-header h3 {
+        margin: 0;
+        color: #667eea;
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+    
+    .order-date {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .order-items-list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+    }
+    
+    .order-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .order-item img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-right: 1rem;
+    }
+    
+    .item-info {
+        flex-grow: 1;
+    }
+    
+    .item-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.3rem;
+    }
+    
+    .item-details {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .order-summary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .order-total {
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+    
+    .order-status {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="container" style="flex-direction: column; max-width: 1000px;">
+    
+    <h1><i class="fas fa-history"></i> Your Order History</h1>
+
+    <div th:if="${#lists.isEmpty(orders)}" class="empty-message">
+      <i class="fas fa-shopping-basket"></i>
+      <h3>No orders yet</h3>
+      <p>You haven't placed any orders yet. Start shopping now!</p>
+      <a href="/home" class="continue-shopping">
+        <i class="fas fa-shopping-bag"></i> Start Shopping
+      </a>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(orders)}">
+      <div class="order-card" th:each="order : ${orders}">
+        <div class="order-header">
+          <h3>
+            <i class="fas fa-receipt"></i> 
+            Order #<span th:text="${order.id}">000</span>
+          </h3>
+          <div class="order-date">
+            <i class="fas fa-calendar"></i>
+            <span th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy HH:mm')}">Date</span>
+          </div>
+        </div>
+        
+        <div class="order-items">
+          <h4 style="color: #2c3e50; margin-bottom: 1rem; font-size: 1.1rem;">
+            <i class="fas fa-box"></i> Items Ordered:
+          </h4>
+          <ul class="order-items-list">
+            <li class="order-item" th:each="item : ${order.orderItems}">
+              <img th:src="@{'/images/' + ${item.product.imageName}}" 
+                   th:alt="${item.product.name}" />
+              <div class="item-info">
+                <div class="item-name" th:text="${item.product.name}">Product Name</div>
+                <div class="item-details">
+                  Quantity: <strong th:text="${item.quantity}">1</strong> × 
+                  ₹<span th:text="${#numbers.formatDecimal(item.priceAtOrder, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                </div>
+              </div>
+              <div style="text-align: right; font-weight: bold; color: #28a745;">
+                ₹<span th:text="${#numbers.formatDecimal(item.quantity * item.priceAtOrder, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="order-summary">
+          <div class="order-total">
+            <i class="fas fa-calculator"></i>
+            Total: ₹<span th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+          </div>
+          <div class="order-status">
+            <i class="fas fa-info-circle"></i>
+            Status: <span th:text="${order.status}">Pending</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 3rem;">
+      <a href="/home" class="continue-shopping">
+        <i class="fas fa-arrow-left"></i> Back to Shopping
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

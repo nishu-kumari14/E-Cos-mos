@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Shopping Cart - Cosmos</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<div class="app-container">
+  <div class="container" style="flex-direction: column; max-width: 1000px;">
+    
+    <h1><i class="fas fa-shopping-cart"></i> Your Shopping Cart</h1>
+
+    <div th:if="${errorMessage}" class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(items)}" class="empty-message">
+      <i class="fas fa-shopping-cart"></i>
+      <h3>Your cart is empty</h3>
+      <p>Looks like you haven't added anything to your cart yet.</p>
+      <a href="/home" class="continue-shopping">
+        <i class="fas fa-shopping-bag"></i> Start Shopping
+      </a>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(items)}">
+      <table>
+        <thead>
+        <tr>
+          <th><i class="fas fa-image"></i> Product</th>
+          <th><i class="fas fa-info-circle"></i> Details</th>
+          <th><i class="fas fa-sort-numeric-up"></i> Quantity</th>
+          <th><i class="fas fa-tag"></i> Price</th>
+          <th><i class="fas fa-calculator"></i> Total</th>
+          <th><i class="fas fa-cogs"></i> Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${items}">
+          <td>
+            <img th:src="@{'/images/' + ${item.product.imageName}}" 
+                 th:alt="${item.product.name}" />
+          </td>
+          <td>
+            <h4 th:text="${item.product.name}" style="margin-bottom: 0.5rem; color: #2c3e50;"></h4>
+            <p th:text="${item.product.description}" style="color: #666; font-size: 0.9rem;"></p>
+          </td>
+          <td>
+            <span style="font-weight: bold; font-size: 1.1rem;" th:text="${item.quantity}"></span>
+          </td>
+          <td>
+            <span style="font-weight: bold; color: #667eea;">
+              ₹<span th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 2, 'POINT')}"></span>
+            </span>
+          </td>
+          <td>
+            <span style="font-weight: bold; color: #28a745; font-size: 1.1rem;">
+              ₹<span th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'COMMA', 2, 'POINT')}"></span>
+            </span>
+          </td>
+          <td>
+            <div class="table-actions">
+              <form th:action="@{'/cart/increase/' + ${item.product.id}}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem;">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </form>
+              <form th:action="@{'/cart/decrease/' + ${item.product.id}}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem;">
+                  <i class="fas fa-minus"></i>
+                </button>
+              </form>
+              <form th:action="@{'/cart/remove/' + ${item.product.id}}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem;" 
+                        onclick="return confirm('Remove this item from cart?')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <div class="cart-total">
+        <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+        <div class="total-amount">
+          Total: ₹<span th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 2, 'POINT')}"></span>
+        </div>
+      </div>
+
+      <div class="checkout-section">
+        <form th:action="@{/cart/proceedToBuy}" method="post">
+          <button type="submit" class="btn btn-primary" style="font-size: 1.2rem; padding: 1rem 3rem;">
+            <i class="fas fa-credit-card"></i> Proceed to Checkout
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 3rem;">
+      <a href="/home" class="continue-shopping">
+        <i class="fas fa-arrow-left"></i> Continue Shopping
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

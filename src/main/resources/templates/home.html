@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Cosmos - Everything available here</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<div class="app-container">
+    <!-- Header -->
+    <div class="header-bar">
+        <div class="nav-container">
+            <a href="/home" class="logo">
+                <div class="logo-content">
+                    <i class="fas fa-shopping-bag"></i>
+                    <div class="logo-text">
+                        <span>Cosmos</span>
+                        <span class="tagline">Everything available here</span>
+                    </div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <div sec:authorize="isAuthenticated()" class="user-info">
+                    <i class="fas fa-user"></i> Welcome, <span sec:authentication="name"></span>!
+                </div>
+                <a th:href="@{/products/add}" sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')">
+                    <i class="fas fa-plus"></i> Add Product
+                </a>
+                <a th:href="@{/cart/view}">
+                    <i class="fas fa-shopping-cart"></i> Cart
+                </a>
+                <a th:href="@{/wishlist/view}">
+                    <i class="fas fa-heart"></i> Wishlist
+                </a>
+                <a th:href="@{/order/history}">
+                    <i class="fas fa-history"></i> Orders
+                </a>
+                <form th:action="@{/logout}" method="post" style="display: inline;" sec:authorize="isAuthenticated()">
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+                <a th:href="@{/login}" sec:authorize="!isAuthenticated()">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a th:href="@{/register}" sec:authorize="!isAuthenticated()">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3><i class="fas fa-list"></i> Categories</h3>
+            <ul>
+                <li><a th:href="@{/home}"><i class="fas fa-th-large"></i> All Products</a></li>
+                <li th:each="category : ${categories}">
+                    <a th:href="@{/home(categoryId=${category.id})}" th:text="${category.name}">
+                        <i class="fas fa-tag"></i> Category Name
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Products -->
+        <div class="main-content">
+            <h1><i class="fas fa-store"></i> Our Products</h1>
+            
+            <div class="product-grid" th:if="${!#lists.isEmpty(products)}">
+                <div class="product-card" th:each="product : ${products}">
+                    <div class="product-image-container">
+                        <img th:src="@{'/images/' + ${product.imageName}}" 
+                             th:alt="${product.name}" />
+                    </div>
+                    
+                    <div class="product-info">
+                        <h3 th:text="${product.name}">Product Name</h3>
+                        <p th:text="${product.description}">Description</p>
+                        
+                        <div class="product-price">
+                            ₹<span th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </div>
+                        
+                        <div class="stock-info">
+                            <i class="fas fa-boxes"></i>
+                            <span th:class="${product.quantity == 0 ? 'out-of-stock' : 'stock-available'}" 
+                                  th:text="${product.quantity == 0 ? 'Out of Stock' : 'Stock: ' + product.quantity}">
+                                Stock: 0
+                            </span>
+                        </div>
+                        
+                        <div class="product-actions">
+                            <form th:action="@{'/cart/add/' + ${product.id}}" method="post">
+                                <button type="submit" class="btn btn-primary" th:disabled="${product.quantity == 0}">
+                                    <i class="fas fa-cart-plus"></i> Add to Cart
+                                </button>
+                            </form>
+                            
+                            <form th:action="@{'/wishlist/add/' + ${product.id}}" method="post">
+                                <button type="submit" class="btn btn-secondary">
+                                    <i class="fas fa-heart"></i> Add to Wishlist
+                                </button>
+                            </form>
+
+                            <form th:action="@{'/products/delete/' + ${product.id}}" method="post" 
+                                  onsubmit="return confirm('Are you sure you want to delete this product?');" 
+                                  sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Remove Product
+                                </button>
+                            </form>
+
+                            <div class="update-stock-form" sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_SELLER')">
+                                <form th:action="@{'/products/updateStock/' + ${product.id}}" method="post">
+                                    <label for="newStock">
+                                        <i class="fas fa-edit"></i> Update Stock:
+                                    </label>
+                                    <input type="number" id="newStock" name="quantity" 
+                                           th:value="${product.quantity}" min="0">
+                                    <button type="submit" class="btn">Update</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="empty-message" th:if="${#lists.isEmpty(products)}">
+                <i class="fas fa-box-open"></i>
+                <h3>No products found in this category</h3>
+                <p>Try browsing other categories or check back later!</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
